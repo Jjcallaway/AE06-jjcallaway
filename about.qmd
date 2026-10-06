@@ -1,0 +1,9 @@
+---
+title: "About"
+---
+
+For the past 6 years on and off, I have worked on video game programming, and asset creation, largely the latter.
+
+```{r}
+1 + 1
+```

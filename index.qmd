@@ -1,0 +1,15 @@
+---
+title: "AE06-jjcallaway"
+---
+
+[Mike Mahoney](https://www.mm218.dev/)
+
+personal website + blog 
+
+Feels like I could use this as a portfolio of game development adjacent things I have done, largely asset creation.
+
+To learn more about Quarto websites visit <https://quarto.org/docs/websites>.
+
+```{r}
+1 + 1
+```

@@ -1,0 +1,103 @@
+---
+title: "AE03 - Exploring gerrymandring"
+author: "Joseph Callaway"
+date: "2026-09-10"
+format: html
+execute: 
+  warning: false
+  message: false
+---
+
+## Getting started
+
+Load the `tidyverse`, `usdata`, and `sjPlot` packages, and get the `gerrymander` data out of the `usdata` package. View the data using `glimpse`.
+
+```{r}
+library(tidyverse)
+library(usdata)
+library(sjPlot)
+
+gerrymander <- usdata::gerrymander
+```
+
+## 1. Congressional districts per state
+
+Which state has the most congressional districts? The least? How many congressional districts are there in this state? Use functions such as `table`, `tbl_summary` or `count`.
+
+```{r}
+#I am adding extra comments so I can try and better remember what functions do
+#by writing out what they do in my own words
+gerrymander %>% 
+  #count tallies up the number of rows that have a type of state, sort = TRUE 
+  #allows for the values to be sorted biggest to smallest
+  count(state,sort = TRUE) 
+  
+```
+
+It has been determined that the state with the largest number of districts is California
+
+## 2. Districts at the tails
+
+Make side-by-side box plots of percent of vote received by Trump in the 2016 Presidential Election by prevalence of gerrymandering. Identify any Congressional Districts that are potential outliers — points that fall well outside the whiskers of their box, meaning that district's Trump vote share was unusually high or low compared to other districts with the same gerrymandering prevalence. What information can you share about them?
+
+```{r}
+# Specifies the data that is to be loaded for a graph
+ggplot(gerrymander,aes(x = gerry,y = trump16)) +
+  # Sets the graph type and what color and alpha level it should have
+  geom_boxplot() +
+    #Graph Customization 
+    labs( x = "Prevalence of Gerrymandering" , y = "Trump Vote share by Gerrymandering (%)" , title = "Trump Vote Share by Gerrymandering Prevalence")
+```
+
+```{r}
+#I am frankly unsure if this is acceptable, The work I am comparing it to seems different
+
+
+gerrymander %>%
+  filter(gerry == "low", trump16 > 90 | trump16 < 10) %>%
+  select(district,trump16,gerry)
+
+#outliers <- gerrymander %>% 
+#  group_by(gerry) 
+```
+
+## 3. Gerrymandering and flipping
+
+This relationship can be looked at from two directions — does gerrymandering predict a 2018 flip, and does a 2018 flip predict gerrymandering? Support **both** with a visualization and summary statistics. The plot answers "what does the mix look like within each group?"; the table gives the exact proportions the plot is showing. Write 1-2 bullet points about what you noticed from each plot. Use specific numbers in your answer.
+
+**Direction 1:** Is a Congressional District more likely to have high prevalence of gerrymandering if a Democrat was able to flip the seat in the 2018 election? To compare the breakdown of gerrymandering prevalence within each flipped group, make sure `flip18` is on the x axis and that your percents add up to 100% within each category.
+
+```{r}
+ggplot(gerrymander, aes(x = flip18, fill = gerry)) +
+  geom_bar(position = "fill",alpha = .7) +
+  labs(x = "2018 Democratic Flip", y = "Percent", fill = "Gerrymandering Prevalence"
+  )
+```
+
+**Conclusions to be drawn here are that Democrats had medium gerrymandering and the flip does not appear to be directly assoicated with high gerrymandering**
+
+**Direction 2:** Is a Congressional District more likely to be flipped to a Democratic seat if it has high prevalence of gerrymandering, or low prevalence? Same two variables, just flipped — so now `gerry` is on the x-axis. Again, make sure your percents add up to 100% within each category.
+
+```{r}
+ggplot(gerrymander, aes(x = gerry, fill = factor(flip18))) +
+  geom_bar(position = "fill",alpha = .7) +
+  labs(
+    x = "Gerrymandering Prevalence", y = "Percent",fill = "2018 Democratic Flip")
+```
+
+**Flips became less common as gerrymandering became higher.**
+
+## 4. Gerrymandering and presidential margin
+
+Using `mutate`, create a new variable, `margin16`, measuring how many percentage points Clinton won or lost by in each district (`clinton16 - trump16`). Does gerrymandering prevalence relate to how lopsided the 2016 presidential race was in that district? Report the min, mean, and max margin by `gerry` level, then visualize the full distribution with a violin + boxplot combo. Describe the shape, center, and spread of each group.
+
+```{r}
+gerrymander %>% 
+  mutate(margin16 = clinton16 - trump16) %>%
+
+ggplot(aes(x = gerry, y = margin16)) +
+  geom_violin() +
+  geom_boxplot(width = .2)
+```
+
+**Overall since each of the spreads are fairly wide, it is fair to conclude that there was no strong correlation between gerrymandering and how lopsided the 2016 electon was**
